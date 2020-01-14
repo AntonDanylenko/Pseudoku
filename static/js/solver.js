@@ -213,6 +213,55 @@ function nextValidGuess(board, cell, num){
 }
 
 
+function writeCell(board, cell, num, stack){
+  board[cell] = num;
+  stack.push([cell,num]);
+}
+
+
+
+// NEW_CELL = 0
+// FIND_NEXT_CELL = 1
+// BACKTRACK = 2
+// TEST_CLIQUE = 3
+// NEXT_CLIQUE = 4
+// NEXT_SEARCH_TYPE = 5
+// NEXT_NUM = 6
+// REPEAT = 7
+// NAIVE_TIME = 8
+// START_STRAT = 9
+// FIND_NEXT_FORCED = 10
+
+function execute(board){
+  makeNeighbors();
+  var mystack = new MyStack();
+  var state = 0;
+
+  while (state!=2){
+    switch (state){
+
+      case 0:
+        console.log("CASE 0");
+        var sole_candidate = nextSoleCandidate(board,-1);
+        while (sole_candidate[0]!=81){
+          console.log(sole_candidate);
+          board[sole_candidate[0]] = sole_candidate[1];
+          sole_candidate = nextSoleCandidate(board,sole_candidate[0]);
+        }
+        state = 1;
+        break;
+
+      case 1:
+        console.log("CASE 1");
+        state = 2;
+        break;
+    }
+  }
+
+  return board;
+}
+
+
 
 
 
@@ -237,7 +286,7 @@ function test(){
 
   // console.log(test_board);
 
-  makeNeighbors();
+  // makeNeighbors();
   // console.log(neighbors);
 
   // console.log(findClique(9,1));
@@ -255,7 +304,7 @@ function test(){
   // console.log(test_board);
   // printBoard(test_board);
 
-  
+  printBoard(execute(test_board));
 }
 
 test();
