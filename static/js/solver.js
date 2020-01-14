@@ -101,6 +101,119 @@ function makeNeighbors(){
   // console.log(neighbors);
 }
 
+function printBoard(board){
+  var result = "";
+  for (var x=0; x<9; x++){
+    for (var y=0; y<9; y++){
+      result = result + board[x*9+y] + ",";
+    }
+    result+="\n";
+  }
+  console.log(result);
+}
+
+
+function findClique(cell, search_type){
+  if (cell==-1){
+    return clique_list[search_type][0];
+  }
+  for (var clique=0; clique<clique_list[search_type].length; clique++){
+    if (clique_list[search_type][clique].includes(cell)){
+      return clique_list[search_type][clique];
+    }
+  }
+  return null;
+}
+
+function nextClique(clique, search_type){
+  var index = clique_list[search_type].indexOf(clique);
+  if (index!=8){
+    return clique_list[search_type][index+1];
+  }
+  return null;
+}
+
+
+
+function nextOpenCell(board, prev_cell){
+  for (var x=prev_cell+1; x<board.length; x++){
+    if (board[x]=='_'){
+      return x;
+    }
+  }
+  return null;
+}
+
+function nextOpenCellinClique(board, prev_cell, clique){
+  var start = 0;
+  if (clique.includes(prev_cell)){
+    start = clique.indexOf(prev_cell)+1;
+  }
+  for (var x=start; x<clique.length; x++){
+    if (board[clique[x]]=='_'){
+      return clique[x];
+    }
+  }
+  return null;
+}
+
+
+
+function canPlace(board, cell, num){
+  for (var x=0; x<neighbors[cell].length; x++){
+    if (board[neighbors[cell][x]]==num){
+      return false;
+    }
+  }
+  return true;
+}
+
+function soleCandidate(board, cell){
+  var candidate = 0;
+  for (var num=1; num<10; num++){
+    if (canPlace(board,cell,num)){
+      if (candidate==0){
+        candidate=num;
+      }
+      else {
+        return 0;
+      }
+    }
+  }
+  return candidate;
+}
+
+function nextSoleCandidate(board, prev_cell){
+  for (var x=prev_cell+1; x<board.length; x++){
+    if (board[x]=='_'){
+      var num = soleCandidate(board,x);
+      if (num!=0){
+        return [x,num];
+      }
+    }
+  }
+  return [81,0];
+}
+
+
+
+function nextValidGuess(board, cell, num){
+  var temp = [0,false];
+  for (var guess=num; guess<10; guess++){
+    if (canPlace(board,cell,guess)){
+      if (temp[0]==0){
+        temp = [guess,true];
+      }
+      else {
+        return [temp[0],false];
+      }
+    }
+  }
+  return temp;
+}
+
+
+
 
 
 function test(){
@@ -125,6 +238,24 @@ function test(){
   // console.log(test_board);
 
   makeNeighbors();
+  // console.log(neighbors);
+
+  // console.log(findClique(9,1));
+  // console.log(nextClique(findClique(80,0),0));
+
+  // console.log(nextOpenCell(test_board,0));
+  // console.log(nextOpenCellinClique(test_board,9,findClique(9,1)));
+
+  // console.log(canPlace(test_board,9,3));
+  // console.log(soleCandidate(test_board, 40));
+  // console.log(nextSoleCandidate(test_board,-1));
+
+  // console.log(nextValidGuess(test_board,40,1));
+
+  // console.log(test_board);
+  // printBoard(test_board);
+
+  
 }
 
 test();
