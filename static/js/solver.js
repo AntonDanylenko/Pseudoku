@@ -64,7 +64,7 @@ var neighbors = {};
 class MyStack {
   constructor(cells = [], list = []){
     this.cells = cells;
-    this.stack = list;
+    this.stack = list; // stack of boards
   }
 
   string(){
@@ -111,6 +111,17 @@ function printBoard(board){
   }
   console.log(result);
 }
+
+function compBoards(board0, board1){
+  for (var x=0; x<81; x++){
+    if (board0[x]!=board1[x] && board0[x]!='_' && board1[x]!='_'){
+      console.log(x);
+      return false;
+    }
+  }
+  return true;
+}
+
 
 
 function findClique(cell, search_type){
@@ -232,28 +243,88 @@ function writeCell(board, cell, num, stack){
 // START_STRAT = 9
 // FIND_NEXT_FORCED = 10
 
-function execute(board){
+function execute(board, solved=[]){
   makeNeighbors();
   var mystack = new MyStack();
   var state = 0;
 
-  while (state!=2){
+  while (state!=5){
     switch (state){
 
       case 0:
-        console.log("CASE 0");
+        // console.log("CASE 0");
         var sole_candidate = nextSoleCandidate(board,-1);
         while (sole_candidate[0]!=81){
-          console.log(sole_candidate);
+          // console.log(sole_candidate);
           board[sole_candidate[0]] = sole_candidate[1];
           sole_candidate = nextSoleCandidate(board,sole_candidate[0]);
         }
+        printBoard(board);
+        console.log(compBoards(board,solved));
         state = 1;
         break;
 
       case 1:
-        console.log("CASE 1");
-        state = 2;
+        // console.log("CASE 1");
+        var cells_changed = 0;
+        for (var cur_num=1; cur_num<10; cur_num++){
+          for (var search_type=0; search_type<3; search_type++){
+            var clique = findClique(0,search_type);
+            while (clique!=null){
+              // console.log(clique);
+              var sole_candidate = [-1, false];
+              var cell = nextOpenCellinClique(board,-1,clique);
+              while (cell!=null){
+                if (canPlace(board,cell,cur_num)){
+                  if (sole_candidate[0]==-1){
+                    sole_candidate = [cell, true];
+                  }
+                  else {
+                    sole_candidate = [cell, false];
+                  }
+                }
+                cell = nextOpenCellinClique(board,cell,clique);
+              }
+              if (sole_candidate[1]){
+                board[sole_candidate[0]] = cur_num;
+                cells_changed+=1;
+              }
+              clique = nextClique(clique,search_type);
+            }
+          }
+        }
+        printBoard(board);
+        console.log(compBoards(board,solved));
+        if (cells_changed!=0){
+          state = 0;
+        }
+        else {
+          state = 2;
+        }
+        break;
+
+      case 2:
+        // console.log("CASE 2");
+
+
+
+        // printBoard(board);
+        // console.log(compBoards(board,solved));
+        state = 3;
+        break;
+
+      case 3:
+        // console.log("CASE 3");
+        // printBoard(board);
+        // console.log(compBoards(board,solved));
+        state = 4;
+        break;
+
+      case 4:
+        // console.log("CASE 4");
+        // printBoard(board);
+        // console.log(compBoards(board,solved));
+        state = 5;
         break;
     }
   }
@@ -264,6 +335,46 @@ function execute(board){
 
 
 
+var test_board_easy = ['_', '_', '_', '_', '_', '_', '_', '_', '_',
+                      '_', '7', '9', '_', '5', '_', '1', '8', '_',
+                      '8', '_', '_', '_', '_', '_', '_', '_', '7',
+                      '_', '_', '7', '3', '_', '6', '8', '_', '_',
+                      '4', '5', '_', '7', '_', '8', '_', '9', '6',
+                      '_', '_', '3', '5', '_', '2', '7', '_', '_',
+                      '7', '_', '_', '_', '_', '_', '_', '_', '5',
+                      '_', '1', '6', '_', '3', '_', '4', '2', '_',
+                      '_', '_', '_', '_', '_', '_', '_', '_', '_'];
+
+var solved_test_board_easy = ["3","4","5","8","7","1","2","6","9",
+                              "2","7","9","6","5","3","1","8","4",
+                              "8","6","1","4","2","9","5","3","7",
+                              "1","9","7","3","4","6","8","5","2",
+                              "4","5","2","7","1","8","3","9","6",
+                              "6","8","3","5","9","2","7","4","1",
+                              "7","3","8","2","6","4","9","1","5",
+                              "5","1","6","9","3","7","4","2","8",
+                              "9","2","4","1","8","5","6","7","3"];
+
+var test_board_hard = ["_","_","_","_","_","3","_","1","7",
+                      "_","1","5","_","_","9","_","_","8",
+                      "_","6","_","_","_","_","_","_","_",
+                      "1","_","_","_","_","7","_","_","_",
+                      "_","_","9","_","_","_","2","_","_",
+                      "_","_","_","5","_","_","_","_","4",
+                      "_","_","_","_","_","_","_","2","_",
+                      "5","_","_","6","_","_","3","4","_",
+                      "3","4","_","2","_","_","_","_","_"];
+
+var solved_test_board_hard = ["2","9","4","8","6","3","5","1","7",
+                              "7","1","5","4","2","9","6","3","8",
+                              "8","6","3","7","5","1","4","9","2",
+                              "1","5","2","9","4","7","8","6","3",
+                              "4","7","9","3","8","6","2","5","1",
+                              "6","3","8","5","1","2","9","7","4",
+                              "9","8","6","1","3","4","7","2","5",
+                              "5","2","1","6","7","8","3","4","9",
+                              "3","4","7","2","9","5","1","8","6"];
+
 
 function test(){
   // console.log(Cliques);
@@ -273,16 +384,6 @@ function test(){
   // test_stack.push([80,3]);
   // test_stack.push([1,9]);
   // console.log(test_stack.string());
-
-  var test_board = ['_', '_', '_', '_', '_', '_', '_', '_', '_',
-                    '_', '7', '9', '_', '5', '_', '1', '8', '_',
-                    '8', '_', '_', '_', '_', '_', '_', '_', '7',
-                    '_', '_', '7', '3', '_', '6', '8', '_', '_',
-                    '4', '5', '_', '7', '_', '8', '_', '9', '6',
-                    '_', '_', '3', '5', '_', '2', '7', '_', '_',
-                    '7', '_', '_', '_', '_', '_', '_', '_', '5',
-                    '_', '1', '6', '_', '3', '_', '4', '2', '_',
-                    '_', '_', '_', '_', '_', '_', '_', '_', '_'];
 
   // console.log(test_board);
 
@@ -304,7 +405,8 @@ function test(){
   // console.log(test_board);
   // printBoard(test_board);
 
-  printBoard(execute(test_board));
+  printBoard(test_board_hard);
+  printBoard(execute(test_board_hard,solved_test_board_hard));
 }
 
 test();
