@@ -59,6 +59,7 @@ var cols = [[0,9,18,27,36,45,54,63,72],
             ];
 var clique_list = [squares, rows, cols];
 var neighbors = {};
+makeNeighbors();
 
 
 class MyStack {
@@ -126,6 +127,23 @@ function compBoards(board0, board1){
   }
   return true;
 }
+
+function checkBoard(board){
+  for (var search_type=0; search_type<3; search_type++){
+    for (var clique=0; clique<clique_list[search_type].length; clique++){
+      var nums = [];
+      for (var cell=0; cell<clique_list[search_type][clique].length; cell++){
+        if (nums.includes(board[clique_list[search_type][clique][cell]])){
+          return false;
+        }
+        nums.push(board[clique_list[search_type][clique][cell]]);
+      }
+    }
+  }
+  return true;
+}
+
+
 
 
 
@@ -267,7 +285,7 @@ function getShortestIndex(array){
 
 
 
-function case0(board, state, solved){
+function case0(board, state){
   var sole_num = nextSoleCandidate(board,-1);
   while (sole_num[0]!=81){
     if (sole_num[1]==-1){
@@ -284,7 +302,7 @@ function case0(board, state, solved){
   return [board,state];
 }
 
-function case1(board, state, solved){
+function case1(board, state){
   var cells_changed = 0;
   for (var cur_num=1; cur_num<10; cur_num++){
     for (var search_type=0; search_type<3; search_type++){
@@ -315,18 +333,15 @@ function case1(board, state, solved){
   // console.log(compBoards(board,solved));
   if (cells_changed!=0){
     state = 0;
-    return [board,state,[]];
   }
   else {
-    guess_board = makeGuessBoard(board);
     state = 2;
-    return [board,state,guess_board];
   }
+  return [board,state];
 }
 
 
-function execute(board, solved=[]){
-  makeNeighbors();
+function execute(board){
   var mystack = new MyStack();
   var guess_board = [];
   var state = 0;
@@ -336,23 +351,111 @@ function execute(board, solved=[]){
 
       case 0:
         // console.log("CASE 0 SOLE NUM");
-        var update = case0(board,state,solved);
+        var update = case0(board,state);
         board = update[0];
         state = update[1];
         break;
 
       case 1:
         // console.log("CASE 1 SOLE SPOT");
-        var update = case1(board,state,solved);
+        var update = case1(board,state);
         board = update[0];
         state = update[1];
-        guess_board = update[2];
+        if (state==2){
+          guess_board = makeGuessBoard(board);
+        }
         break;
 
       case 2:
         // console.log("CASE 2 GUESS");
         var cell = getShortestIndex(guess_board);
         // printBoard(guess_board);
+        if (guess_board[cell].length==0){
+          state = 3;
+          break;
+        }
+        board[cell] = guess_board[cell][0];
+        guess_board[cell] = guess_board[cell].slice(1);
+        mystack.push([cell,board.slice(0),guess_board.slice(0)])
+
+        // printBoard(board);
+        // console.log(compBoards(board,solved));
+        state = 0;
+        break;
+
+      case 3:
+        // console.log("CASE 3 BACKTRACK");
+        var popped = mystack.pop();
+        board = popped[1];
+        guess_board = popped[2];
+
+        // printBoard(guess_board);
+        // printBoard(board);
+        // console.log(compBoards(board,solved));
+        state = 2;
+        break;
+    }
+  }
+
+  return board;
+}
+
+
+
+
+
+function shuffle(array){
+  if (array.includes(0)){
+    return array;
+  }
+
+  var result = [];
+  while (array.length>0){
+    var num = array[Math.floor(Math.random()*array.length)];
+    result.push(num);
+    array = array.filter(function(item) {return item !== num});
+  }
+  return result;
+}
+
+function makeGuessRandom(board){
+  var guess_board = [];
+  for (var x=0; x<81; x++){
+    guess_board.push(shuffle(getGuesses(board,x)));
+  }
+  return guess_board;
+}
+
+function generateFilled(){
+  var board = Array(81).fill("_");
+  var mystack = new MyStack();
+  var guess_board = [];
+  var state = 0;
+
+  while (board.includes('_')){
+    switch (state){
+
+      case 0:
+        // console.log("CASE 0 SOLE NUM");
+        var update = case0(board,state);
+        board = update[0];
+        state = update[1];
+        break;
+
+      case 1:
+        // console.log("CASE 1 SOLE SPOT");
+        var update = case1(board,state);
+        board = update[0];
+        state = update[1];
+        if (state==2){
+          guess_board = makeGuessRandom(board);
+          // printBoard(guess_board);
+        }
+        break;
+
+      case 2:
+        // console.log("CASE 2 GUESS");
+        var cell = getShortestIndex(guess_board);
         if (guess_board[cell].length==0){
           state = 3;
           break;
@@ -476,9 +579,15 @@ function test(){
   // printBoard(test_board);
 
   // printBoard(test_board_easy);
-  start_time = new Date().getTime();
-  printBoard(execute(test_board_easy,solved_test_board_easy));
-  console.log(new Date().getTime() - start_time);
+  // start_time = new Date().getTime();
+  // printBoard(execute(test_board_easy,solved_test_board_easy));
+  // console.log(new Date().getTime() - start_time);
+
+  // start_time = new Date().getTime();
+  // var filled = generateFilled();
+  // console.log(new Date().getTime() - start_time);
+  // printBoard(filled);
+  // console.log(checkBoard(filled));
 }
 
 test();
