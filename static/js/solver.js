@@ -62,9 +62,10 @@ var neighbors = {};
 
 
 class MyStack {
-  constructor(cells = [], list = []){
+  constructor(cells = [], list = [], guesses = []){
     this.cells = cells;
     this.stack = list; // stack of boards
+    this.guess = guesses; // stack of guess_boards
   }
 
   string(){
@@ -74,10 +75,11 @@ class MyStack {
   push(args){
     this.cells.push(args[0]);
     this.stack.push(args[1]);
+    this.guess.push(args[2]);
   }
 
   pop(){
-    return [this.cells.pop(), this.stack.pop()];
+    return [this.cells.pop(), this.stack.pop(), this.guess.pop()];
   }
 }
 
@@ -98,14 +100,18 @@ function makeNeighbors(){
     }
     neighbors[cell] = temp;
   }
-  // console.log(neighbors);
 }
 
 function printBoard(board){
   var result = "";
   for (var x=0; x<9; x++){
     for (var y=0; y<9; y++){
-      result = result + board[x*9+y] + ",";
+      if (board[x*9+y]=="_"){
+        result+="[ ]";
+      }
+      else {
+        result = result + "[" + board[x*9+y] + "]";
+      }
     }
     result+="\n";
   }
@@ -114,8 +120,7 @@ function printBoard(board){
 
 function compBoards(board0, board1){
   for (var x=0; x<81; x++){
-    if (board0[x]!=board1[x] && board0[x]!='_' && board1[x]!='_'){
-      console.log(x);
+    if (board0[x]!=board1[x] && board0[x]!='_'){
       return false;
     }
   }
@@ -171,6 +176,9 @@ function nextOpenCellinClique(board, prev_cell, clique){
 
 
 function canPlace(board, cell, num){
+  if (board[cell]!='_'){
+    return false;
+  }
   for (var x=0; x<neighbors[cell].length; x++){
     if (board[neighbors[cell][x]]==num){
       return false;
@@ -180,10 +188,10 @@ function canPlace(board, cell, num){
 }
 
 function soleCandidate(board, cell){
-  var candidate = 0;
+  var candidate = -1;
   for (var num=1; num<10; num++){
     if (canPlace(board,cell,num)){
-      if (candidate==0){
+      if (candidate==-1){
         candidate=num;
       }
       else {
@@ -223,108 +231,151 @@ function nextValidGuess(board, cell, num){
   return temp;
 }
 
+function getGuesses(board, cell){
+  var guesses = [];
+  for (var x=1; x<10; x++){
+    if (canPlace(board,cell,x)){
+      guesses.push(x);
+    }
+  }
+  if (guesses.length==0){
+    return [0,0,0,0,0,0,0,0,0];
+  }
+  else {
+    return guesses;
+  }
+}
 
-function writeCell(board, cell, num, stack){
-  board[cell] = num;
-  stack.push([cell,num]);
+function makeGuessBoard(board){
+  var guess_board = [];
+  for (var x=0; x<81; x++){
+    guess_board.push(getGuesses(board,x));
+  }
+  return guess_board;
+}
+
+function getShortestIndex(array){
+  var min = 0;
+  for (var x=0; x<array.length; x++){
+    if (array[x].length<array[min].length){
+      min = x;
+    }
+  }
+  return min;
 }
 
 
 
-// NEW_CELL = 0
-// FIND_NEXT_CELL = 1
-// BACKTRACK = 2
-// TEST_CLIQUE = 3
-// NEXT_CLIQUE = 4
-// NEXT_SEARCH_TYPE = 5
-// NEXT_NUM = 6
-// REPEAT = 7
-// NAIVE_TIME = 8
-// START_STRAT = 9
-// FIND_NEXT_FORCED = 10
+
+function case0(board, state, solved){
+  var sole_num = nextSoleCandidate(board,-1);
+  while (sole_num[0]!=81){
+    if (sole_num[1]==-1){
+      // console.log("ERROR FOUND 0");
+      state = 3;
+      return [board,state];
+    }
+    board[sole_num[0]] = sole_num[1];
+    sole_num = nextSoleCandidate(board,sole_num[0]);
+  }
+  // printBoard(board);
+  // console.log(compBoards(board,solved));
+  state = 1;
+  return [board,state];
+}
+
+function case1(board, state, solved){
+  var cells_changed = 0;
+  for (var cur_num=1; cur_num<10; cur_num++){
+    for (var search_type=0; search_type<3; search_type++){
+      var clique = findClique(0,search_type);
+      while (clique!=null){
+        var sole_spot = [-1, false];
+        var cell = nextOpenCellinClique(board,-1,clique);
+        while (cell!=null){
+          if (canPlace(board,cell,cur_num)){
+            if (sole_spot[0]==-1){
+              sole_spot = [cell, true];
+            }
+            else {
+              sole_spot = [cell, false];
+            }
+          }
+          cell = nextOpenCellinClique(board,cell,clique);
+        }
+        if (sole_spot[1]){
+          board[sole_spot[0]] = cur_num;
+          cells_changed+=1;
+        }
+        clique = nextClique(clique,search_type);
+      }
+    }
+  }
+  // printBoard(board);
+  // console.log(compBoards(board,solved));
+  if (cells_changed!=0){
+    state = 0;
+    return [board,state,[]];
+  }
+  else {
+    guess_board = makeGuessBoard(board);
+    state = 2;
+    return [board,state,guess_board];
+  }
+}
+
 
 function execute(board, solved=[]){
   makeNeighbors();
   var mystack = new MyStack();
+  var guess_board = [];
   var state = 0;
 
-  while (state!=5){
+  while (board.includes('_')){
     switch (state){
 
       case 0:
-        // console.log("CASE 0");
-        var sole_candidate = nextSoleCandidate(board,-1);
-        while (sole_candidate[0]!=81){
-          // console.log(sole_candidate);
-          board[sole_candidate[0]] = sole_candidate[1];
-          sole_candidate = nextSoleCandidate(board,sole_candidate[0]);
-        }
-        printBoard(board);
-        console.log(compBoards(board,solved));
-        state = 1;
+        // console.log("CASE 0 SOLE NUM");
+        var update = case0(board,state,solved);
+        board = update[0];
+        state = update[1];
         break;
 
       case 1:
-        // console.log("CASE 1");
-        var cells_changed = 0;
-        for (var cur_num=1; cur_num<10; cur_num++){
-          for (var search_type=0; search_type<3; search_type++){
-            var clique = findClique(0,search_type);
-            while (clique!=null){
-              // console.log(clique);
-              var sole_candidate = [-1, false];
-              var cell = nextOpenCellinClique(board,-1,clique);
-              while (cell!=null){
-                if (canPlace(board,cell,cur_num)){
-                  if (sole_candidate[0]==-1){
-                    sole_candidate = [cell, true];
-                  }
-                  else {
-                    sole_candidate = [cell, false];
-                  }
-                }
-                cell = nextOpenCellinClique(board,cell,clique);
-              }
-              if (sole_candidate[1]){
-                board[sole_candidate[0]] = cur_num;
-                cells_changed+=1;
-              }
-              clique = nextClique(clique,search_type);
-            }
-          }
-        }
-        printBoard(board);
-        console.log(compBoards(board,solved));
-        if (cells_changed!=0){
-          state = 0;
-        }
-        else {
-          state = 2;
-        }
+        // console.log("CASE 1 SOLE SPOT");
+        var update = case1(board,state,solved);
+        board = update[0];
+        state = update[1];
+        guess_board = update[2];
         break;
 
       case 2:
-        // console.log("CASE 2");
-
-
+        // console.log("CASE 2 GUESS");
+        var cell = getShortestIndex(guess_board);
+        // printBoard(guess_board);
+        if (guess_board[cell].length==0){
+          state = 3;
+          break;
+        }
+        board[cell] = guess_board[cell][0];
+        guess_board[cell] = guess_board[cell].slice(1);
+        mystack.push([cell,board.slice(0),guess_board.slice(0)])
 
         // printBoard(board);
         // console.log(compBoards(board,solved));
-        state = 3;
+        state = 0;
         break;
 
       case 3:
-        // console.log("CASE 3");
-        // printBoard(board);
-        // console.log(compBoards(board,solved));
-        state = 4;
-        break;
+        // console.log("CASE 3 BACKTRACK");
+        var popped = mystack.pop();
+        board = popped[1];
+        guess_board = popped[2];
 
-      case 4:
-        // console.log("CASE 4");
+        // printBoard(guess_board);
         // printBoard(board);
         // console.log(compBoards(board,solved));
-        state = 5;
+        state = 2;
         break;
     }
   }
@@ -375,6 +426,25 @@ var solved_test_board_hard = ["2","9","4","8","6","3","5","1","7",
                               "5","2","1","6","7","8","3","4","9",
                               "3","4","7","2","9","5","1","8","6"];
 
+var test_board_escargot = ["1","_","_","_","_","7","_","9","_",
+                          "_","3","_","_","2","_","_","_","8",
+                          "_","_","9","6","_","_","5","_","_",
+                          "_","_","5","3","_","_","9","_","_",
+                          "_","1","_","_","8","_","_","_","2",
+                          "6","_","_","_","_","4","_","_","_",
+                          "3","_","_","_","_","_","_","1","_",
+                          "_","4","_","_","_","_","_","_","7",
+                          "_","_","7","_","_","_","3","_","_"];
+
+var solved_test_board_escargot = ["1","6","2","8","5","7","4","9","3",
+                                  "5","3","4","1","2","9","6","7","8",
+                                  "7","8","9","6","4","3","5","2","1",
+                                  "4","7","5","3","1","2","9","8","6",
+                                  "9","1","3","5","8","6","7","4","2",
+                                  "6","2","8","7","9","4","1","3","5",
+                                  "3","5","6","4","7","8","2","1","9",
+                                  "2","4","1","9","3","5","8","6","7",
+                                  "8","9","7","2","6","1","3","5","4"];
 
 function test(){
   // console.log(Cliques);
@@ -405,8 +475,10 @@ function test(){
   // console.log(test_board);
   // printBoard(test_board);
 
-  printBoard(test_board_hard);
-  printBoard(execute(test_board_hard,solved_test_board_hard));
+  // printBoard(test_board_easy);
+  start_time = new Date().getTime();
+  printBoard(execute(test_board_easy,solved_test_board_easy));
+  console.log(new Date().getTime() - start_time);
 }
 
 test();
