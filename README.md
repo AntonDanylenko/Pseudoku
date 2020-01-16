@@ -1,1 +1,1 @@
-# SudokuHub_CS146
+# iSudoku
