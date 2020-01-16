@@ -1,0 +1,63 @@
+<!-- Anton Danylenko -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="static/css/main.css">
+    <link rel="shortcut icon" href="static/img/favicon.ico">
+    <title>Pseudoku || Main</title>
+  </head>
+  <body onload="insertPuzzle(); newGame();">
+    <header>Pseudoku</header>
+    <div class="navbar">
+      <div id="settings">
+        <a href="" onclick="return false;">
+          <img src="static/img/pause.svg" alt="Pause" onclick="checkPause()">
+        </a>
+        <div id="utensils">
+          <a class="active" id="pen" href="" onclick="return false;">
+            <img src="static/img/pen.svg" alt="Pen" onclick="switchUtensil(0)">
+          </a>
+          <a id="pencil" href="" onclick="return false;">
+            <img src="static/img/pencil.svg" alt="Pencil" onclick="switchUtensil(1)">
+          </a>
+        </div>
+      </div>
+      <div id="difficulty">
+        <ul>
+          <li><a class="active" id="easy" href="">Easy</a></li>
+          <li><a id="medium" href="">Medium</a></li>
+          <li><a id="hard" href="">Hard</a></li>
+        </ul>
+      </div>
+      <div id="time">
+        00:00:00
+      </div>
+    </div>
+    <div id="puzzle" hidden></div>
+    <div class="board">
+      <canvas id="myCanvas" width="603" height="603"></canvas>
+    </div>
+    <div class="pauseMenu">
+      <h1>Game Paused</h1>
+      <p>Press the pause button again to resume the game</p>
+      <p>Use the pencil tool to keep track of your guesses</p>
+      <p>Use the pen tool to enter in a guess</p>
+    </div>
+
+    <div id="winAlert" class="modal">
+      <!-- Modal content -->
+      <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <center>
+          <h2>YOU WON!!!</h2>
+          <div id="finalTime">Time: 00:00:00</div>
+          <br>
+          <button id="newGame" onclick="newGame()">NEW GAME</button>
+        </center>
+      </div>
+    </div>
+    <script src="static/js/board.js"></script>
+    <script src="static/js/pseudoku.js"></script>
+  </body>
+</html>

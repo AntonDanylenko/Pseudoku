@@ -1,3 +1,5 @@
+// Anton Danylenko
+
 var AllVals = new Set([1,2,3,4,5,6,7,8,9]);
 var Cliques = [new Set([0,1,2,3,4,5,6,7,8]),
               new Set([9,10,11,12,13,14,15,16,17]),
@@ -314,15 +316,12 @@ function case0(board, state){
   var sole_num = nextSoleCandidate(board,-1);
   while (sole_num[0]!=81){
     if (sole_num[1]==-1){
-      // console.log("ERROR FOUND 0");
       state = 3;
       return [board,state];
     }
     board[sole_num[0]] = sole_num[1];
     sole_num = nextSoleCandidate(board,sole_num[0]);
   }
-  // printBoard(board);
-  // console.log(compBoards(board,solved));
   state = 1;
   return [board,state];
 }
@@ -354,8 +353,6 @@ function case1(board, state){
       }
     }
   }
-  // printBoard(board);
-  // console.log(compBoards(board,solved));
   if (cells_changed!=0){
     state = 0;
   }
@@ -387,7 +384,6 @@ function execute(board){
         state = update[1];
         if (state==2){
           guess_board = makeGuessRandom(board);
-          // printBoard(guess_board);
         }
         break;
 
@@ -402,8 +398,6 @@ function execute(board){
         guess_board[cell] = guess_board[cell].slice(1);
         mystack.push([cell,board.slice(0),guess_board.slice(0)])
 
-        // printBoard(board);
-        // console.log(compBoards(board,solved));
         state = 0;
         break;
 
@@ -413,9 +407,6 @@ function execute(board){
         board = popped[1];
         guess_board = popped[2];
 
-        // printBoard(guess_board);
-        // printBoard(board);
-        // console.log(compBoards(board,solved));
         state = 2;
         break;
     }
@@ -427,8 +418,8 @@ function execute(board){
 function generateSudoku(level){
   var board = execute(Array(81).fill("_"));
   var filled_board = board.slice(0);
-  var levels = [45,35,25];
-  var max_filled = levels[level] + Math.floor(Math.random()*10);
+  var levels = [35,30,25];
+  var max_filled = levels[level] + Math.floor(Math.random()*5);
   var cur_filled = 81;
   var mystack = new MyStack();
   var backtracks = 0;
@@ -458,108 +449,6 @@ function generateSudoku(level){
 
 
 
-
-var test_board_easy = ['_', '_', '_', '_', '_', '_', '_', '_', '_',
-                      '_', '7', '9', '_', '5', '_', '1', '8', '_',
-                      '8', '_', '_', '_', '_', '_', '_', '_', '7',
-                      '_', '_', '7', '3', '_', '6', '8', '_', '_',
-                      '4', '5', '_', '7', '_', '8', '_', '9', '6',
-                      '_', '_', '3', '5', '_', '2', '7', '_', '_',
-                      '7', '_', '_', '_', '_', '_', '_', '_', '5',
-                      '_', '1', '6', '_', '3', '_', '4', '2', '_',
-                      '_', '_', '_', '_', '_', '_', '_', '_', '_'];
-
-var solved_test_board_easy = ["3","4","5","8","7","1","2","6","9",
-                              "2","7","9","6","5","3","1","8","4",
-                              "8","6","1","4","2","9","5","3","7",
-                              "1","9","7","3","4","6","8","5","2",
-                              "4","5","2","7","1","8","3","9","6",
-                              "6","8","3","5","9","2","7","4","1",
-                              "7","3","8","2","6","4","9","1","5",
-                              "5","1","6","9","3","7","4","2","8",
-                              "9","2","4","1","8","5","6","7","3"];
-
-var test_board_hard = ["_","_","_","_","_","3","_","1","7",
-                      "_","1","5","_","_","9","_","_","8",
-                      "_","6","_","_","_","_","_","_","_",
-                      "1","_","_","_","_","7","_","_","_",
-                      "_","_","9","_","_","_","2","_","_",
-                      "_","_","_","5","_","_","_","_","4",
-                      "_","_","_","_","_","_","_","2","_",
-                      "5","_","_","6","_","_","3","4","_",
-                      "3","4","_","2","_","_","_","_","_"];
-
-var solved_test_board_hard = ["2","9","4","8","6","3","5","1","7",
-                              "7","1","5","4","2","9","6","3","8",
-                              "8","6","3","7","5","1","4","9","2",
-                              "1","5","2","9","4","7","8","6","3",
-                              "4","7","9","3","8","6","2","5","1",
-                              "6","3","8","5","1","2","9","7","4",
-                              "9","8","6","1","3","4","7","2","5",
-                              "5","2","1","6","7","8","3","4","9",
-                              "3","4","7","2","9","5","1","8","6"];
-
-var test_board_escargot = ["1","_","_","_","_","7","_","9","_",
-                          "_","3","_","_","2","_","_","_","8",
-                          "_","_","9","6","_","_","5","_","_",
-                          "_","_","5","3","_","_","9","_","_",
-                          "_","1","_","_","8","_","_","_","2",
-                          "6","_","_","_","_","4","_","_","_",
-                          "3","_","_","_","_","_","_","1","_",
-                          "_","4","_","_","_","_","_","_","7",
-                          "_","_","7","_","_","_","3","_","_"];
-
-var solved_test_board_escargot = ["1","6","2","8","5","7","4","9","3",
-                                  "5","3","4","1","2","9","6","7","8",
-                                  "7","8","9","6","4","3","5","2","1",
-                                  "4","7","5","3","1","2","9","8","6",
-                                  "9","1","3","5","8","6","7","4","2",
-                                  "6","2","8","7","9","4","1","3","5",
-                                  "3","5","6","4","7","8","2","1","9",
-                                  "2","4","1","9","3","5","8","6","7",
-                                  "8","9","7","2","6","1","3","5","4"];
-
-function test(){
-  // console.log(Cliques);
-
-  // test_stack = new MyStack();
-  // console.log(test_stack.string());
-  // test_stack.push([80,3]);
-  // test_stack.push([1,9]);
-  // console.log(test_stack.string());
-
-  // console.log(test_board);
-
-  // makeNeighbors();
-  // console.log(neighbors);
-
-  // console.log(findClique(9,1));
-  // console.log(nextClique(findClique(80,0),0));
-
-  // console.log(nextOpenCell(test_board,0));
-  // console.log(nextOpenCellinClique(test_board,9,findClique(9,1)));
-
-  // console.log(canPlace(test_board,9,3));
-  // console.log(soleCandidate(test_board, 40));
-  // console.log(nextSoleCandidate(test_board,-1));
-
-  // console.log(nextValidGuess(test_board,40,1));
-
-  // console.log(test_board);
-  // printBoard(test_board);
-
-  // printBoard(test_board_escargot);
-  // start_time = new Date().getTime();
-  // printBoard(execute(test_board_escargot,solved_test_board_escargot));
-  // console.log(new Date().getTime() - start_time);
-
-  // start_time = new Date().getTime();
-  // var filled = generateFilled();
-  // console.log(new Date().getTime() - start_time);
-  // printBoard(filled);
-  // console.log(checkBoard(filled));
-
-  // printBoard(generateSudoku(2));
+function insertPuzzle(){
+  document.getElementById("puzzle").innerHTML = generateSudoku(0);
 }
-
-test();

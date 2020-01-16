@@ -1,4 +1,4 @@
-// Anton Danylenko, Ian Searfoss
+// Anton Danylenko
 
 var canvas = document.getElementById('myCanvas');
 var context = canvas.getContext('2d');
@@ -23,14 +23,14 @@ var t;
 var timer_active;
 var boardRef = document.querySelector(".board");
 var pauseRef = document.querySelector(".pauseMenu");
-var secretFontChange;
 
 // MAIN FUNCTIONS
 
 function newGame(){
   selected = null;
-  init_board = test_board.slice();
-  // init_board = document.getElementById("puzzle").innerHTML.split(',');
+  // init_board = test_board.slice();
+  init_board = document.getElementById("puzzle").innerHTML.split(",");
+  // console.log(init_board);
   cur_board = init_board.slice();
   pencil_board = [];
   for (var i=0; i<81; i++) {
@@ -40,7 +40,6 @@ function newGame(){
   unlocked = true;
   timer = 0;
   timer_active = false;
-  secretFontChange = false;
   setupBoard();
   timer_active = true;
   // console.log("setupBoard startTimer");
@@ -181,9 +180,6 @@ function writeNumber(number, x, y, error_cells, type='temp') {
   // console.log("" + sectorX + ", " + sectorY)
   context.clearRect(sectorX+9, sectorY+9, canvas.width/9-18, canvas.height/9-18);
   context.font = '50px Arial';
-  if(secretFontChange){
-    context.font = '50px Comic Sans MS'
-  }
   context.fillStyle = 'black';
 
   if (type=='perm'){
@@ -283,9 +279,6 @@ function pencilNumber(num, x, y) {
   var sectorY = findSector(y, canvas.height);
   var index = (sectorY*9/canvas.height)*9 + sectorX*9/canvas.width;
   context.font = '15px Arial';
-  if(secretFontChange){
-    context.font = '15px Comic Sans MS'
-  }
   context.fillStyle = 'black';
   context.fillText(num, sectorX+10+20*((num-1)%3), sectorY+20+18*Math.floor((num-1)/3));
   pencil_board[index][num-1] = num;
@@ -406,9 +399,6 @@ function moveSelected(canvas, key) {
 
 
 function changeTimer(){
-  /*
-  starts the timer everytime the page is reloaded
-  */
   document.getElementById("time").innerHTML = displayTime(timer);
   t = setTimeout(function(){ changeTimer() }, 1000);
   timer = timer + 1;
@@ -428,12 +418,8 @@ function displayTime(calcTime){
 }
 
 function startTimer(){
-  /*
-  starts the timer
-  */
   if (unlocked){
     timer_active = true;
-    // console.log("startTimer changeTimer")
     changeTimer();
     document.querySelector(".pauseMenu").style.display = "none";
   }
@@ -443,9 +429,6 @@ function startTimer(){
 }
 
 function pauseTimer(){
-  /*
-  pauses the timer when pause is clicked
-  */
   clearTimeout(t);
   timer_active = false;
   if (unlocked){
@@ -454,45 +437,22 @@ function pauseTimer(){
 }
 
 function checkPause(){
-  /*
-  checks if hitting pause will pause or start timer
-  */
   if(timer_active){
     pauseTimer();
   }
   else {
-    // timer = timer - 1;
-    // console.log("checkPause startTimer");
     startTimer();
   }
-  // document.getElementById("board").style.display = "block";
   if (unlocked) {
     boardRef.classList.toggle("hidden");
   }
 }
 
 function addZeros(i){
-  /*
-  adds zeros to the start of times less than 10 so it looks better
-  */
   if(i < 10){
     i = "0" + i;
   }
   return i;
-}
-
-function secret(){
-  if(!secretFontChange){
-    document.querySelector("body").style.fontFamily = "Comic Sans MS, Arial, Sans-serif"
-    secretFontChange = true;
-  }
-  else{
-    document.querySelector("body").style.fontFamily = "Arial, Sans-serif"
-    secretFontChange = false;
-  }
-  setupBoard();
-  placeAll();
-  // checkPause();
 }
 
 function switchUtensil(button) {
@@ -593,34 +553,4 @@ function winTime(){
   pauseTimer();
   unselectSquare(selected[0],selected[1]);
   openModal();
-}
-
-function updateInfoBoard(){
-  var formRef = document.getElementById("infoBoard");
-  if(formRef.elements[0].value == ""){
-    // alert("You must enter a name!!")
-    return
-  }
-  var formParent = formRef.parentElement
-  var listRef = document.getElementById("infoList");
-  var listThatGetsAddedTo = document.createElement("p");
-  var checkedRadio = "easy";
-  var listOfDifficultyElements = document.getElementsByName("difficulty");
-  for (var i = 0; i < listOfDifficultyElements.length; i++) {
-    if (listOfDifficultyElements[i].checked){
-      checkedRadio = listOfDifficultyElements[i].value;
-    }
-  }
-  var selectedNum = 10;
-  var numList = document.getElementsByName("enjoyment");
-  for (var i = 0; i < numList.length; i++) {
-    if (numList[i].selected){
-      selectedNum = numList[i].value;
-    }
-  }
-  var textStuff = document.createTextNode(formRef.elements[0].value + ": " + checkedRadio + " - " + selectedNum + "/10");
-  listThatGetsAddedTo.appendChild(textStuff);
-  formRef.remove()
-  formParent.insertBefore(document.createTextNode("Thanks for your feedback!"), formParent.childNodes[2]);
-  listRef.insertBefore(listThatGetsAddedTo, listRef.childNodes[0]);
 }

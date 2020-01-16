@@ -131,34 +131,6 @@ header {
   text-align: center;
 }
 
-#secretHolder {
-  width: 50px;
-  height: 50px;
-  position: absolute;
-  bottom: 0px;
-  left: 0px;
-  margin: 0;
-  padding: 0;
-  background-color: #E6E6FA;
-  border: 1px solid grey;
-}
-
-#secret {
-  width: 100%;
-  height: 100%;
-}
-
-.userInfoBoard {
-  width: 100%;
-  margin: auto;
-  background-color: #B2D7FF;
-  border: 1px solid grey;
-}
-
-.userInfoBoard h3 {
-  text-align: center;
-}
-
 .modal {
   display: none;
   position: fixed;
@@ -196,8 +168,7 @@ header {
   cursor: pointer;
 }
 
-#newGame,
-.userInfoBoard button {
+#newGame {
   font-size: 14px;
   display: block;
   color: #000;
