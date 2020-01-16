@@ -258,7 +258,7 @@ function getGuesses(board, cell){
     }
   }
   if (guesses.length==0){
-    return [0,0,0,0,0,0,0,0,0];
+    return [0,0,0,0,0,0,0,0,0,0];
   }
   else {
     return guesses;
