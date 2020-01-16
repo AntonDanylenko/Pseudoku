@@ -84,7 +84,6 @@ class MyStack {
   }
 }
 
-
 function makeNeighbors(){
   for (var cell=0; cell<81; cell++){
     var temp = [];
@@ -121,7 +120,7 @@ function printBoard(board){
 
 function compBoards(board0, board1){
   for (var x=0; x<81; x++){
-    if (board0[x]!=board1[x] && board0[x]!='_'){
+    if (board0[x]!=board1[x]){
       return false;
     }
   }
@@ -285,6 +284,32 @@ function getShortestIndex(array){
 
 
 
+
+
+
+
+
+function shuffle(array){
+  if (array.includes(0)){
+    return array;
+  }
+  var result = [];
+  while (array.length>0){
+    var num = array[Math.floor(Math.random()*array.length)];
+    result.push(num);
+    array = array.filter(function(item) {return item !== num});
+  }
+  return result;
+}
+
+function makeGuessRandom(board){
+  var guess_board = [];
+  for (var x=0; x<81; x++){
+    guess_board.push(shuffle(getGuesses(board,x)));
+  }
+  return guess_board;
+}
+
 function case0(board, state){
   var sole_num = nextSoleCandidate(board,-1);
   while (sole_num[0]!=81){
@@ -340,94 +365,7 @@ function case1(board, state){
   return [board,state];
 }
 
-
 function execute(board){
-  var mystack = new MyStack();
-  var guess_board = [];
-  var state = 0;
-
-  while (board.includes('_')){
-    switch (state){
-
-      case 0:
-        // console.log("CASE 0 SOLE NUM");
-        var update = case0(board,state);
-        board = update[0];
-        state = update[1];
-        break;
-
-      case 1:
-        // console.log("CASE 1 SOLE SPOT");
-        var update = case1(board,state);
-        board = update[0];
-        state = update[1];
-        if (state==2){
-          guess_board = makeGuessBoard(board);
-        }
-        break;
-
-      case 2:
-        // console.log("CASE 2 GUESS");
-        var cell = getShortestIndex(guess_board);
-        // printBoard(guess_board);
-        if (guess_board[cell].length==0){
-          state = 3;
-          break;
-        }
-        board[cell] = guess_board[cell][0];
-        guess_board[cell] = guess_board[cell].slice(1);
-        mystack.push([cell,board.slice(0),guess_board.slice(0)])
-
-        // printBoard(board);
-        // console.log(compBoards(board,solved));
-        state = 0;
-        break;
-
-      case 3:
-        // console.log("CASE 3 BACKTRACK");
-        var popped = mystack.pop();
-        board = popped[1];
-        guess_board = popped[2];
-
-        // printBoard(guess_board);
-        // printBoard(board);
-        // console.log(compBoards(board,solved));
-        state = 2;
-        break;
-    }
-  }
-
-  return board;
-}
-
-
-
-
-
-function shuffle(array){
-  if (array.includes(0)){
-    return array;
-  }
-
-  var result = [];
-  while (array.length>0){
-    var num = array[Math.floor(Math.random()*array.length)];
-    result.push(num);
-    array = array.filter(function(item) {return item !== num});
-  }
-  return result;
-}
-
-function makeGuessRandom(board){
-  var guess_board = [];
-  for (var x=0; x<81; x++){
-    guess_board.push(shuffle(getGuesses(board,x)));
-  }
-  return guess_board;
-}
-
-function generateFilled(){
-  var board = Array(81).fill("_");
   var mystack = new MyStack();
   var guess_board = [];
   var state = 0;
@@ -483,6 +421,38 @@ function generateFilled(){
     }
   }
 
+  return board;
+}
+
+function generateSudoku(level){
+  var board = execute(Array(81).fill("_"));
+  var filled_board = board.slice(0);
+  var levels = [45,35,25];
+  var max_filled = levels[level] + Math.floor(Math.random()*10);
+  var cur_filled = 81;
+  var mystack = new MyStack();
+  var backtracks = 0;
+  while (cur_filled>max_filled){
+    var cell = Math.floor(Math.random()*81);
+    if (board[cell]!='_'){
+      mystack.push([cell,board.slice(0)]);
+      board[cell] = '_';
+      if (compBoards(execute(board.slice(0)),filled_board)){
+        cur_filled-=1;
+      }
+      else {
+        var old = mystack.pop();
+        board = old[1].slice(0);
+        backtracks+=1;
+      }
+    }
+    if (backtracks>5){
+      var old = mystack.pop();
+      board = old[1].slice(0);
+      backtracks = 0;
+      cur_filled+=1;
+    }
+  }
   return board;
 }
 
@@ -578,9 +548,9 @@ function test(){
   // console.log(test_board);
   // printBoard(test_board);
 
-  // printBoard(test_board_easy);
+  // printBoard(test_board_escargot);
   // start_time = new Date().getTime();
-  // printBoard(execute(test_board_easy,solved_test_board_easy));
+  // printBoard(execute(test_board_escargot,solved_test_board_escargot));
   // console.log(new Date().getTime() - start_time);
 
   // start_time = new Date().getTime();
@@ -588,6 +558,8 @@ function test(){
   // console.log(new Date().getTime() - start_time);
   // printBoard(filled);
   // console.log(checkBoard(filled));
+
+  // printBoard(generateSudoku(2));
 }
 
 test();
