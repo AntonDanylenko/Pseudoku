@@ -39,6 +39,7 @@ function newGame(){
   utensil = 0; // pen
   unlocked = true;
   timer = 0;
+  clearTimeout(t);
   timer_active = false;
   setupBoard();
   timer_active = true;
@@ -553,4 +554,13 @@ function winTime(){
   pauseTimer();
   unselectSquare(selected[0],selected[1]);
   openModal();
+}
+
+function difficulty(dif){
+  var difs = ["easy", "medium", "hard"];
+  for (var x=0; x<3; x++){
+    document.getElementById(difs[x]).className = "";
+  }
+  document.getElementById(difs[dif]).className = "active";
+  newGame();
 }

@@ -449,6 +449,6 @@ function generateSudoku(level){
 
 
 
-function insertPuzzle(){
-  document.getElementById("puzzle").innerHTML = generateSudoku(0);
+function insertPuzzle(dif){
+  document.getElementById("puzzle").innerHTML = generateSudoku(dif);
 }
