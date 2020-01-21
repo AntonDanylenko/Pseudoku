@@ -426,7 +426,7 @@ function generateSudoku(level){
   var counter = 0;
   while (cur_filled>max_filled){
     // console.log(counter);
-    if (counter>400){
+    if (counter>500){
       return generateSudoku(level);
     }
     var cell = Math.floor(Math.random()*81);
