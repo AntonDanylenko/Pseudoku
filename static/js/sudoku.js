@@ -425,7 +425,7 @@ function generateSudoku(level){
   var backtracks = 0;
   var counter = 0;
   while (cur_filled>max_filled){
-    console.log(counter);
+    // console.log(counter);
     if (counter>400){
       return generateSudoku(level);
     }
