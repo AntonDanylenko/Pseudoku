@@ -423,7 +423,12 @@ function generateSudoku(level){
   var cur_filled = 81;
   var mystack = new MyStack();
   var backtracks = 0;
+  var counter = 0;
   while (cur_filled>max_filled){
+    console.log(counter);
+    if (counter>400){
+      return generateSudoku(level);
+    }
     var cell = Math.floor(Math.random()*81);
     if (board[cell]!='_'){
       mystack.push([cell,board.slice(0)]);
@@ -443,6 +448,7 @@ function generateSudoku(level){
       backtracks = 0;
       cur_filled+=1;
     }
+    counter+=1;
   }
   return board;
 }
