@@ -475,6 +475,14 @@ function openModal(){
   // console.log(unlocked);
   document.getElementById("winAlert").style.display = "block";
   document.getElementById("finalTime").innerHTML = "Time: " + displayTime(timer-1);
+  var dif = "Easy";
+  if (document.getElementById("medium").className == "active"){
+    dif = "Medium";
+  }
+  else if (document.getElementById("hard").className == "active"){
+    dif = "Hard";
+  }
+  document.getElementById("finalDifficulty").innerHTML = "Difficulty: " + dif;
 }
 
 function closeModal(){
