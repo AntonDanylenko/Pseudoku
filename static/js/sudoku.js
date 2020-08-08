@@ -457,4 +457,16 @@ function generateSudoku(level){
 
 function insertPuzzle(dif){
   document.getElementById("puzzle").innerHTML = generateSudoku(dif);
+
+  // var newspaper_board = ["7", "_", "_", "8", "_", "_", "_", "_", "1",
+  //                        "_", "4", "_", "_", "2", "_", "_", "_", "_",
+  //                        "_", "2", "9", "_", "_", "7", "_", "_", "_",
+  //                        "_", "1", "_", "3", "_", "_", "7", "_", "_",
+  //                        "_", "_", "_", "_", "9", "_", "_", "1", "_",
+  //                        "_", "_", "_", "_", "_", "4", "_", "_", "_",
+  //                        "_", "_", "_", "_", "_", "_", "8", "_", "_",
+  //                        "_", "_", "_", "_", "_", "1", "_", "7", "_",
+  //                        "_", "_", "7", "_", "_", "_", "_", "_", "3"];
+  // printBoard(execute(newspaper_board));
+  // console.log(checkBoard(execute(newspaper_board)));
 }

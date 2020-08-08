@@ -17,6 +17,7 @@ var cur_board;
 var pencil_board;
 var utensil;
 var unlocked = true;
+var game_over = false;
 
 var timer;
 var t;
@@ -38,6 +39,7 @@ function newGame(){
   }
   utensil = 0; // pen
   unlocked = true;
+  game_over = false;
   timer = 0;
   clearTimeout(t);
   timer_active = false;
@@ -86,7 +88,7 @@ document.addEventListener('click', function(event) {
   // console.log(mousePos);
   if (mousePos[0]>=0 && mousePos[1]>=0 &&
       mousePos[0]<=canvas.width && mousePos[1]<=canvas.height &&
-      unlocked){
+      unlocked && !game_over){
     var sectorX = findSector(mousePos[0], canvas.width);
     var sectorY = findSector(mousePos[1], canvas.height);
     // console.log("selected: "+selected)
@@ -116,7 +118,7 @@ document.addEventListener('keydown', function(event) {
   num = parseInt(String.fromCharCode(key));
   // console.log("Num: " + num);
   // console.log("isNum? "+([1,2,3,4,5,6,7,8,9].includes(num)));
-  if (selected && unlocked){
+  if (selected && unlocked && !game_over){
     var index = (selected[1]*9/canvas.height)*9 + selected[0]*9/canvas.width;
     // console.log("Index: " + index);
     if (37<=key && key<=40){
@@ -159,7 +161,7 @@ document.addEventListener('keydown', function(event) {
       }
     }
   }
-  if (key==32 && unlocked){
+  if (key==32){
     // console.log("!utensil: " + !utensil);
     switchUtensil(!utensil);
   }
@@ -418,34 +420,73 @@ function displayTime(calcTime){
   return `${hours}:${minutes}:${seconds}`
 }
 
+// function startTimer(){
+//   if (unlocked){
+//     timer_active = true;
+//     changeTimer();
+//     document.querySelector(".pauseMenu").style.display = "none";
+//   }
+//   else {
+//     openModal();
+//   }
+// }
+//
+// function pauseTimer(){
+//   clearTimeout(t);
+//   timer_active = false;
+//   if (unlocked){
+//     document.querySelector(".pauseMenu").style.display = "block";
+//   }
+// }
+//
+// function checkPause(){
+//   if(timer_active){
+//     pauseTimer();
+//   }
+//   else {
+//     startTimer();
+//   }
+//   if (unlocked) {
+//     boardRef.classList.toggle("hidden");
+//   }
+// }
+
+//START TIMER
 function startTimer(){
-  if (unlocked){
-    timer_active = true;
-    changeTimer();
-    document.querySelector(".pauseMenu").style.display = "none";
-  }
-  else {
-    openModal();
-  }
+  timer_active = true;
+  changeTimer();
 }
 
+//PAUSE TIMER
 function pauseTimer(){
   clearTimeout(t);
   timer_active = false;
-  if (unlocked){
-    document.querySelector(".pauseMenu").style.display = "block";
-  }
 }
 
+//OPEN PAUSE MENU
 function checkPause(){
-  if(timer_active){
-    pauseTimer();
+  // console.log("game_over: " + game_over);
+  if (!game_over){
+    if(timer_active){
+      unlocked = false;
+      pauseTimer();
+      boardRef.style.display = "none";
+      document.querySelector(".pauseMenu").style.display = "block";
+    }
+    else {
+      unlocked = true;
+      startTimer();
+      boardRef.style.display = "block";
+      document.querySelector(".pauseMenu").style.display = "none";
+    }
   }
   else {
-    startTimer();
-  }
-  if (unlocked) {
-    boardRef.classList.toggle("hidden");
+    if (document.getElementById("winAlert").style.display == "block"){
+      closeModal();
+    }
+    else {
+      openModal();
+    }
   }
 }
 
@@ -559,6 +600,7 @@ function checkWin(){
 
 function winTime(){
   unlocked = false;
+  game_over = true;
   pauseTimer();
   unselectSquare(selected[0],selected[1]);
   openModal();
@@ -571,4 +613,5 @@ function difficulty(dif){
   }
   document.getElementById(difs[dif]).className = "active";
   newGame();
+  checkPause();
 }
