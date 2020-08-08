@@ -30,8 +30,8 @@ var pauseRef = document.querySelector(".pauseMenu");
 
 function newGame(){
   selected = null;
-  // init_board = test_board.slice();
-  init_board = generateSudoku(dif);
+  init_board = test_board.slice();
+  // init_board = generateSudoku(dif);
   // console.log(init_board);
   cur_board = init_board.slice();
   pencil_board = [];
@@ -574,6 +574,7 @@ function winTime(){
   unlocked = false;
   game_over = true;
   unselectSquare(selected[0],selected[1]);
+  pauseTimer();
   checkPause();
 }
 
