@@ -420,37 +420,6 @@ function displayTime(calcTime){
   return `${hours}:${minutes}:${seconds}`
 }
 
-// function startTimer(){
-//   if (unlocked){
-//     timer_active = true;
-//     changeTimer();
-//     document.querySelector(".pauseMenu").style.display = "none";
-//   }
-//   else {
-//     openModal();
-//   }
-// }
-//
-// function pauseTimer(){
-//   clearTimeout(t);
-//   timer_active = false;
-//   if (unlocked){
-//     document.querySelector(".pauseMenu").style.display = "block";
-//   }
-// }
-//
-// function checkPause(){
-//   if(timer_active){
-//     pauseTimer();
-//   }
-//   else {
-//     startTimer();
-//   }
-//   if (unlocked) {
-//     boardRef.classList.toggle("hidden");
-//   }
-// }
-
 //START TIMER
 function startTimer(){
   timer_active = true;
