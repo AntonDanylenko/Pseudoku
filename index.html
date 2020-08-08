@@ -7,7 +7,7 @@
     <link rel="shortcut icon" href="static/img/favicon.ico">
     <title>iSudoku</title>
   </head>
-  <body onload="insertPuzzle(0); newGame();">
+  <body onload="difficulty(0);">
     <header>iSudoku</header>
     <div class="navbar">
       <div id="settings">
@@ -25,9 +25,9 @@
       </div>
       <div id="difficulty">
         <ul>
-          <li><button class="active" id="easy" onclick="insertPuzzle(0); difficulty(0);">Easy</button></li>
-          <li><button id="medium" onclick="insertPuzzle(1); difficulty(1);">Medium</button></li>
-          <li><button id="hard" onclick="insertPuzzle(2); difficulty(2);">Hard</button></li>
+          <li><button class="active" id="easy" onclick="difficulty(0);">Easy</button></li>
+          <li><button id="medium" onclick="difficulty(1);">Medium</button></li>
+          <li><button id="hard" onclick="difficulty(2);">Hard</button></li>
         </ul>
       </div>
       <div id="time">

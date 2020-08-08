@@ -18,6 +18,7 @@ var pencil_board;
 var utensil;
 var unlocked = true;
 var game_over = false;
+var dif = 0;
 
 var timer;
 var t;
@@ -30,7 +31,7 @@ var pauseRef = document.querySelector(".pauseMenu");
 function newGame(){
   selected = null;
   // init_board = test_board.slice();
-  init_board = document.getElementById("puzzle").innerHTML.split(",");
+  init_board = generateSudoku(dif);
   // console.log(init_board);
   cur_board = init_board.slice();
   pencil_board = [];
@@ -49,6 +50,8 @@ function newGame(){
   startTimer();
   // checkPause();
   closeModal();
+  boardRef.style.display = "block";
+  document.querySelector(".pauseMenu").style.display = "none";
 }
 
 function setupBoard(){
@@ -570,17 +573,17 @@ function checkWin(){
 function winTime(){
   unlocked = false;
   game_over = true;
-  pauseTimer();
   unselectSquare(selected[0],selected[1]);
-  openModal();
+  checkPause();
 }
 
-function difficulty(dif){
+function difficulty(difficulty){
+  dif = difficulty;
   var difs = ["easy", "medium", "hard"];
   for (var x=0; x<3; x++){
     document.getElementById(difs[x]).className = "";
   }
   document.getElementById(difs[dif]).className = "active";
   newGame();
-  checkPause();
+  // checkPause();
 }
